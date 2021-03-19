@@ -1,0 +1,27 @@
+{
+  "name": "ethers-tutorial-token",
+  "version": "0.0.1",
+  "description": "A simple tutorial and demo for using the ethers libraries and utilities.",
+  "main": "index.js",
+  "scripts": {
+    "start": "./node_modules/.bin/ethers-build serve --testnet",
+    "test": "./node_modules/.bin/mocha test-token.js --timeout 100000"
+  },
+  "dependencies": {
+    "ethers": "^2.1.0",
+    "ethers-cli": "^2.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^3.2.0"
+  },
+  "keywords": [
+    "ethereum",
+    "ethers",
+    "ethers-build",
+    "ethers-cli",
+    "tutorial",
+    "token"
+  ],
+  "author": "Richard Moore <me@ricmoo.com>",
+  "license": "MIT"
+}

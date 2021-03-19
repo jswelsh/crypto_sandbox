@@ -1,0 +1,160 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Free Test Token changed</title>
+        <style type="text/css">
+            html {
+                margin: 0;
+            }
+            body {
+                margin: 40px 0;
+            }
+            .centerer {
+                margin-left: 50%;
+            }
+            .centered {
+                margin-left: -400px;
+                width: 800px;
+            }
+        </style>
+        <link rel="stylesheet" type="text/css" href="./dashboard-v0.2.css">
+    </head>
+    <body>
+        <div class="centerer">
+            <div class="centered">
+                <div id="dashboard"></div>
+            </div>
+        </div>
+
+        <!-- The Ethers Application Client Library -->
+        <!--
+        <script type="text/javascript" src="https://cdn.ethers.io/scripts/ethers-app-v0.4.js"></script>
+        -->
+        <script type="text/javascript" src="http://localhost:8084/ethers-app-v0.4.js"></script>
+
+        <!-- A useful debugging library -->
+        <script type="text/javascript" src="./dashboard-v0.2.js"></script>
+
+        <script type="text/javascript">
+
+            // Our contract
+            var address = '0xFFA43381Cd7F78b6373012360127657283e3b64F';
+            var abi = [{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"amount","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"mint","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"totalSupply","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"amount","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"FreeToken","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"addr","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"amount","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"}];
+            var contract = ethers.getContract(address, abi);
+
+            // We store a reference to the panel that holds the getBalance call so we
+            // can update the address when the user changes accounts
+            var getBalancePanel = null;
+            function updateAccount(address) {
+
+                // No address means the user has no accounts
+                if (!address) { address = ''; }
+
+                // Set the address of the getBalance panel
+                if (getBalancePanel) {
+                    getBalancePanel.values.address = address;
+                }
+            }
+
+            // Get the current account
+            ethers.getAccount().then(function(address){
+                updateAccount(address);
+            });
+
+            // Whenever the account changes...
+            ethers.onaccount = updateAccount;
+
+            // The dashboard API is a quick and simple library for testing, debugging
+            // and simple tools.
+            var dashboard = new Dashboard('dashboard');
+
+
+            // A panel that shows the current total supply with a refresh button
+            (function(panel) {
+                panel.addText('The total supply of this token that has been minted.');
+                panel.addText('This is a call, which is a constant method, so it does not change state and is free.');
+
+                panel.addLabel('Total Supply', 'totalSupply');
+
+                function refresh(value) {
+                    var totalSupplyPromise = contract.totalSupply();
+                    totalSupplyPromise.then(function(result) {
+                        panel.values.totalSupply = ethers.formatEther(result[0]);
+                    });
+                }
+
+                panel.addButton('Refresh', function(values) {
+                    refresh()
+                });
+
+                refresh();
+
+            })(dashboard.addPanel('Total Supply'));
+
+
+            // A panel to get the balance (of Free Test Token) for a given address
+            (function(panel) {
+
+                // Save a reference to this panel for updating when the user changes accounts
+                getBalancePanel = panel;
+
+                panel.addText('Look up the balance of an account for this token.');
+                panel.addText('This is a call, which is a constant method, so it does not change state and is free.');
+
+                panel.addAddressEntry('Address', 'address');
+
+                panel.addButton('Lookup', function(values) {
+                    var balancePromise = contract.balanceOf(values.address);
+                    balancePromise.then(function(result) {
+                        alert('The balance is: ' + ethers.formatEther(result.balance));
+                    });
+                });
+            })(dashboard.addPanel('Get Balance'));
+
+
+            // A panel to mint new tokens, which are assigned to the current user
+            (function(panel) {
+
+                panel.addText('Mint a new token to this account, increasing the total supply.');
+                panel.addText('This is a transaction, which changes state on the blockchain, so the caller must provide a fee.');
+
+                panel.addButton('Mint Token', function(values) {
+                    var mintPromise = contract.mint();
+                    mintPromise.then(function(tx) {
+                        console.log(tx);
+                        return ethers.blockchain.waitForTransaction(tx.hash);
+                    }).then(function(tx) {
+                        console.log(tx);
+                        alert('Mint complete in block number: ' + tx.blockNumber);
+                    });
+                });
+            })(dashboard.addPanel('Mint Token'));
+
+
+            // A panel to transfer tokens to another account
+            (function(panel) {
+                panel.addText('Transfer a token (or fraction of a token) to another account.');
+                panel.addText('This is a transaction, which changes state on the blockchain, so the caller must provide a fee.');
+                panel.addAddressEntry('To Address', 'address');
+                panel.addEtherEntry('Amount', 'amount');
+                panel.addButton('Transfer', function(values) {
+                    var transferPromise = contract.transfer(values.address, values.amount);
+                    transferPromise.then(function(tx) {
+                        console.log(tx);
+                        return ethers.blockchain.waitForTransaction(tx.hash);
+                    }).then(function(tx) {
+                        console.log(tx);
+                        alert('Transfer complete in block number: ' + tx.blockNumber);
+                    });
+                });
+            })(dashboard.addPanel('Transfer Token'));
+
+            // This is triggered when ethers has completely loaded the application
+            ethers.onready = function() {
+                console.log('Ready!');
+            };
+
+        </script>
+    </body>
+</html>
+

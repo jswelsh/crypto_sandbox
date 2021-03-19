@@ -1,0 +1,121 @@
+@keyframes dashboard-pop {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.dashboard-panel {
+    border-top: 1px solid #b2c8d8;
+    color: #4f85ae;
+    padding: 30px 0 15px;
+    font-family: sans-serif;
+}
+
+.dashboard-panel:last-child {
+    border-bottom: 1px solid #b2c8d8;
+}
+
+.dashboard-panel > div {
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+span.dashboard-title {
+    font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    left: 10px;
+    line-height: 30px;
+    height: 30px;
+}
+
+.dashboard-heading {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.dashboard-heading:empty {
+    margin-bottom: 0;
+}
+
+.dashboard-label {
+    height: 38px;
+    line-height: 30px;
+    padding: 4px 10px 4px 210px;
+}
+
+.dashboard-inputbox {
+    border: 1px solid #b2c8d8;
+    cursor: pointer;
+    padding: 4px 10px 4px 210px;
+}
+
+.dashboard-inputbox.dashboard-error {
+    border: 1px solid red;
+}
+
+.dashboard-inputbox input {
+    border: none;
+    color: #4b82b0;
+    font-size: 18px;
+    font-style: italic;
+    line-height: 30px;
+    height: 30px;
+    outline: none;
+    padding: 0;
+    width: 100%;
+}
+
+.dashboard-inputbox input:focus {
+    color: #73aad6;
+    font-style: normal;
+}
+
+.dashboard-checkbox {
+    cursor: pointer;
+    padding: 4px 10px 4px 60px;
+}
+
+.dashboard-checkbox .dashboard-check {
+    border: 3px solid #4b82b0;
+    border-radius: 13px;
+    height: 20px;
+    left: 10px;
+    position: absolute;
+    top: 6px;
+    transition: background-color 0.1s linear;
+    width: 20px;
+}
+
+.dashboard-checkbox .dashboard-check.checked {
+    animation: dashboard-pop 0.3s ease-out;
+    background: #73aad6;
+}
+
+.dashboard-checkbox span {
+    height: 28px;
+    line-height: 28px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.dashboard-button {
+    border: 2px solid #4b82b0;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 40px;
+    text-align: center;
+    width: 200px;
+}
+
+.dashboard-button:hover {
+    border: 2px solid #73aad6;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.25);
+    color: #3f759e;
+}
+
+.dashboard-text {
+    line-height: 22px;
+    text-align: justify;
+}
